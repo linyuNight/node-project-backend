@@ -11,10 +11,6 @@ app.use(cors());
 
 
 const { MongoClient } = require('mongodb');
-// or as an es module:
-// import { MongoClient } from 'mongodb'
-
-// Connection URL
 const url = 'mongodb://localhost:27017';
 const client = new MongoClient(url);
 client.connect();
@@ -26,7 +22,6 @@ app.get('/aaa', (req, res) => {
   res.send('success123')
 })
 
-
 app.get('/test', (req, res) => {
   collection.insertOne({
     name: 'aaa'
@@ -35,10 +30,7 @@ app.get('/test', (req, res) => {
       console.log('测试mogo', data)
 
       res.send(data)
-      // res.send(res)
     })
-
-    // console.log(res)
   })
 })
 
