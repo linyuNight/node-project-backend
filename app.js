@@ -6,7 +6,7 @@ var http = require('http').Server(app)
 // require('./mongodb.js');
 
 app.use(cors());
-// app.use(express.static('public'));
+app.use(express.static('public'));
 
 
 
@@ -21,6 +21,10 @@ client.connect();
 
 const db = client.db('myProject');
 const collection = db.collection('documents');
+
+app.get('/aaa', (req, res) => {
+  res.send('success123')
+})
 
 
 app.get('/test', (req, res) => {
