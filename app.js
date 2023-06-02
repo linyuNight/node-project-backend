@@ -1,4 +1,4 @@
-var express = require('express');
+// var express = require('express');
 var app = require('express')();
 const cors = require('cors');
 var http = require('http').Server(app)
@@ -6,7 +6,7 @@ var http = require('http').Server(app)
 // require('./mongodb.js');
 
 app.use(cors());
-app.use(express.static('public'));
+// app.use(express.static('public'));
 
 
 
