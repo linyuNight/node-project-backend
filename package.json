@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "mongo": "docker run -d --name mongodb -p 27017:27017 mongo"
+    "mongo": "docker run -d --name mongodb -p 27017:27017 mongo",
+    "start": "pm2 start app.js",
+    "stop": "pm2 stop all"
   },
   "keywords": [],
   "author": "",
