@@ -1,15 +1,62 @@
 // var express = require('express');
 var app = require('express')();
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const bodyParser = require('body-parser');
 var http = require('http').Server(app)
 // require('./mysql.js');
 // require('./mongodb.js');
 
+// post数据处理
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+// 跨域
 app.use(cors());
+
+const { Server } = require("socket.io");
+const io = new Server(
+  http, // 这个参数可以自定义，比如直接写 3002
+  {
+    cors: {
+      // origin: "http://localhost:8080"
+      "origin": "*",
+      // "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      // "preflightContinue": false,
+      // "optionsSuccessStatus": 204
+    }
+  }
+);
+
+let initialized = false; // 初始化标志
+
+io.on('connection', (socket) => {
+  if (!initialized) {
+    console.log('测试io');
+
+    // 执行初始化操作
+    initialized = true;
+  }
+
+  socket.on('aaa', (res) => {
+    console.log('测试sockert', res)
+
+    io.emit("hi", "everyone");
+  });
+});
+
+
+
+// setTimeout(() => {
+//   io.emit("hi", "everyone");
+// }, 3000)
+
+
+
 // app.use(express.static('public'));
 
 
-
+// mongo数据库
 const { MongoClient } = require('mongodb');
 const url = 'mongodb://localhost:27017';
 const client = new MongoClient(url);
@@ -31,6 +78,73 @@ app.get('/test', (req, res) => {
 
       res.send(data)
     })
+  })
+})
+
+
+// 注册功能
+const register = async (username, password) => {
+  try {
+    // 检查用户名是否已存在
+    const existingUser = await db.collection('users').findOne({ username });
+
+    if (existingUser) {
+      throw new Error('Username already exists');
+    }
+
+    // 使用 bcrypt 对密码进行哈希处理
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 创建新用户
+    const newUser = { username, password: hashedPassword };
+    const result = await db.collection('users').insertOne(newUser);
+
+    console.log('User registered successfully:', result.insertedId);
+  } catch (error) {
+    console.error('Registration failed:', error.message);
+  } finally {
+    // 关闭数据库连接
+    // client.close();
+  }
+};
+
+// 登录
+const login = async (username, password) => {
+  try {
+    // 检查用户名是否已存在
+    const user = await db.collection('users').findOne({ username });
+
+    if (user) {
+      return bcrypt.compareSync(password, user.password)
+    } else {
+      throw new Error('Username not exists');
+    }
+  } catch (error) {
+    console.error('Registration failed:', error.message);
+  } finally {
+    // 关闭数据库连接
+    // client.close();
+  }
+}
+
+// 注册
+app.post('/register', (req, res) => {
+  console.log('测试post', req.body)
+  register(req.body.username, req.body.password)
+  res.send('success')
+})
+
+// 检查
+app.get('/check', (req, res) => {
+  db.collection('users').find({}).toArray().then(data => {
+    res.send(data)
+  })
+})
+
+// 登录
+app.post('/login', (req, res) => {
+  login(req.body.username, req.body.password).then(data => {
+    res.send(data)
   })
 })
 
