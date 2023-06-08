@@ -18,13 +18,14 @@ const { Server } = require("socket.io");
 const io = new Server(
   http, // 这个参数可以自定义，比如直接写 3002
   {
-    cors: {
-      // origin: "http://localhost:8080"
-      "origin": "*",
-      // "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-      // "preflightContinue": false,
-      // "optionsSuccessStatus": 204
-    }
+    // cors: {
+    //   // origin: "http://localhost:8080"
+    //   "origin": "*",
+    //   // "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    //   // "preflightContinue": false,
+    //   // "optionsSuccessStatus": 204
+    // }
+    cors: true
   }
 );
 
