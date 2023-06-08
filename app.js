@@ -30,6 +30,9 @@ const io = new Server(
 
 let initialized = false; // 初始化标志
 
+// 存储用户和对应的分组信息
+// const users = [];
+
 io.on('connection', (socket) => {
   if (!initialized) {
     console.log('测试io');
@@ -42,6 +45,28 @@ io.on('connection', (socket) => {
     console.log('测试sockert', res)
 
     io.emit("hi", "everyone");
+  });
+
+  // 处理用户加入分组请求
+  socket.on('joinGroup', (group) => {
+    if(group) {
+      // users.push({
+      //   id: socket.id,
+      //   group: group
+      // })
+  
+      socket.join(group);
+    }
+  });
+
+  // 处理客户端发送的消息
+  socket.on('message', (data) => {
+    // let group = users.find(val => {
+    //   return val.id == socket.id
+    // }).group
+
+    console.log('测试group', data.group)
+    io.to(data.group).emit('message', data.message);
   });
 });
 
@@ -82,7 +107,7 @@ app.get('/test', (req, res) => {
 })
 
 
-// 注册功能
+// 注册
 const register = async (username, password) => {
   try {
     // 检查用户名是否已存在
