@@ -11,21 +11,29 @@ var http = require('http').Server(app)
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+console.log('测试env', process.env.NODE_ENV)
+
+let isPro = process.env.NODE_ENV === 'pro'
+// 客户端
+let clientUrl = 'http://103.152.132.60:3000'
+
 // 跨域
-app.use(cors());
+app.use(cors({
+  origin: isPro ? clientUrl : "*"
+}));
 
 const { Server } = require("socket.io");
 const io = new Server(
   http, // 这个参数可以自定义，比如直接写 3002
   {
-    // cors: {
-    //   // origin: "http://localhost:8080"
-    //   "origin": "*",
-    //   // "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    //   // "preflightContinue": false,
-    //   // "optionsSuccessStatus": 204
-    // }
-    cors: true
+    cors: {
+      origin: isPro ? clientUrl : "*"
+      // "origin": "*",
+      // "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      // "preflightContinue": false,
+      // "optionsSuccessStatus": 204
+    }
+    // cors: true
   }
 );
 

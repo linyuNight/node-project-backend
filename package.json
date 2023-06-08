@@ -6,8 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "mongo": "docker run -d --name mongodb -p 27017:27017 mongo",
-    "start": "pm2 start app.js",
-    "stop": "pm2 stop all"
+    "startDev": "NODE_ENV=dev pm2 start app.js",
+    "startPro": "NODE_ENV=pro pm2 start app.js",
+    "stop": "pm2 stop all",
+    "nodemonDev": "NODE_ENV=dev nodemon app.js",
+    "nodemonPro": "NODE_ENV=pro nodemon app.js"
   },
   "keywords": [],
   "author": "",
