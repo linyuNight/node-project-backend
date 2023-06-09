@@ -3,6 +3,9 @@ var app = require('express')();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const jwt = require("jsonwebtoken");
+const authMiddleware = require('./utils/authMiddleware');
+const { tokenKey } = require('./config/index.js')
 var http = require('http').Server(app)
 // require('./mysql.js');
 // require('./mongodb.js');
@@ -21,6 +24,7 @@ let clientUrl = 'http://103.152.132.60:3000'
 app.use(cors({
   origin: isPro ? clientUrl : "*"
 }));
+app.use(authMiddleware);
 
 const { Server } = require("socket.io");
 const io = new Server(
@@ -41,6 +45,25 @@ let initialized = false; // 初始化标志
 
 // 存储用户和对应的分组信息
 // const users = [];
+
+io.use((socket, next) => {
+  // 获取客户端传递的 token
+  const token = socket.handshake.auth.token;
+
+  console.log('io token 验证', token)
+
+  // 验证 token
+  jwt.verify(token, tokenKey, (err, decoded) => {
+    if (err) {
+      // 验证失败，拒绝连接
+      return next(new Error('Invalid token'));
+    }
+
+    // 验证成功，将解码后的数据附加到 socket 对象上
+    socket.decoded = decoded;
+    next();
+  });
+});
 
 io.on('connection', (socket) => {
   if (!initialized) {
@@ -73,9 +96,13 @@ io.on('connection', (socket) => {
     // let group = users.find(val => {
     //   return val.id == socket.id
     // }).group
+    
 
-    console.log('测试group', data.group)
-    io.to(data.group).emit('message', data.message);
+    console.log('测试message data', data)
+    io.to(data.group).emit('message', {
+      username: data.username,
+      message: data.message
+    });
   });
 });
 
@@ -123,7 +150,8 @@ const register = async (username, password) => {
     const existingUser = await db.collection('users').findOne({ username });
 
     if (existingUser) {
-      throw new Error('Username already exists');
+      // throw new Error('Username already exists');
+      return false
     }
 
     // 使用 bcrypt 对密码进行哈希处理
@@ -133,9 +161,11 @@ const register = async (username, password) => {
     const newUser = { username, password: hashedPassword };
     const result = await db.collection('users').insertOne(newUser);
 
-    console.log('User registered successfully:', result.insertedId);
+    // console.log('User registered successfully:', result.insertedId);
+    return true
   } catch (error) {
-    console.error('Registration failed:', error.message);
+    // console.error('Registration failed:', error.message);
+    return false
   } finally {
     // 关闭数据库连接
     // client.close();
@@ -149,7 +179,12 @@ const login = async (username, password) => {
     const user = await db.collection('users').findOne({ username });
 
     if (user) {
-      return bcrypt.compareSync(password, user.password)
+      let isTrue = bcrypt.compareSync(password, user.password)
+      if(isTrue) {
+        return username
+      } else {
+        return false
+      }
     } else {
       throw new Error('Username not exists');
     }
@@ -164,21 +199,54 @@ const login = async (username, password) => {
 // 注册
 app.post('/register', (req, res) => {
   console.log('测试post', req.body)
-  register(req.body.username, req.body.password)
-  res.send('success')
+  register(req.body.username, req.body.password).then(data => {
+    if(data) {
+      res.send('success')
+    } else {
+      res.send('fail')
+    }
+  })  
 })
 
-// 检查
-app.get('/check', (req, res) => {
+// 查看所有用户
+app.get('/check_all_users', (req, res) => {
   db.collection('users').find({}).toArray().then(data => {
     res.send(data)
   })
 })
 
+// 检查当前用户
+app.get('/current_user', async (req, res) => {
+  console.log('hahah', req.decoded.user)
+  console.log('hahah', req.decoded.user.username)
+  const existingUser = await db.collection('users').findOne({ username: req.decoded.user.username });
+  if(existingUser) {
+    // console.log('测试匹配用户', existingUser)
+    res.send({
+      username: existingUser.username
+    })
+  } else {
+    res.send('没有匹配用户')
+  }  
+})
+
 // 登录
 app.post('/login', (req, res) => {
   login(req.body.username, req.body.password).then(data => {
-    res.send(data)
+    if(data) {
+      let username = data
+      const token = jwt.sign({
+        user: {
+          username: username
+        }
+      }, tokenKey, { expiresIn: "3h" });
+      res.send({
+        token: token
+      })
+    } else {
+      res.send(false)
+    }
+    // res.send(data)
   })
 })
 
