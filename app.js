@@ -65,6 +65,7 @@ io.use((socket, next) => {
   });
 });
 
+// sokcket.io连接
 io.on('connection', (socket) => {
   if (!initialized) {
     console.log('测试io');
@@ -96,11 +97,14 @@ io.on('connection', (socket) => {
     // let group = users.find(val => {
     //   return val.id == socket.id
     // }).group
-    
+
+    // db.collection('users').insertOne(newUser);
 
     console.log('测试message data', data)
     io.to(data.group).emit('message', {
       username: data.username,
+      // 目前userid没多大用
+      userid: data.userid,
       message: data.message
     });
   });
@@ -219,11 +223,12 @@ app.get('/check_all_users', (req, res) => {
 app.get('/current_user', async (req, res) => {
   console.log('hahah', req.decoded.user)
   console.log('hahah', req.decoded.user.username)
-  const existingUser = await db.collection('users').findOne({ username: req.decoded.user.username });
-  if(existingUser) {
-    // console.log('测试匹配用户', existingUser)
+  const currentUser = await db.collection('users').findOne({ username: req.decoded.user.username });
+  if(currentUser) {
+    console.log('测试匹配用户', currentUser._id)
     res.send({
-      username: existingUser.username
+      username: currentUser.username,
+      id: currentUser._id
     })
   } else {
     res.send('没有匹配用户')
