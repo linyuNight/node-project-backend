@@ -146,6 +146,39 @@ app.get('/test', (req, res) => {
   })
 })
 
+// 创建群组
+app.post('/create_group', async (req, res) => {
+  console.log('测试req.body', req.body)
+  try {
+    // 检查用户名是否已存在
+    const existingGroup = await db.collection('groups').findOne({ 
+      groupname: req.body.groupname
+    });
+
+    console.log('测试existingGroup', existingGroup)
+    if (existingGroup) {
+      throw new Error('group already exists');
+    }
+
+    // 创建新群组
+    const newGroup = { 
+      groupname: req.body.groupname,
+      creator: req.body.creator
+    };
+
+    console.log('测试newGroup', newGroup)
+    const result = await db.collection('groups').insertOne(newGroup);
+
+    console.log('测试newGroup successfully:', result.insertedId);
+    res.send(true)
+  } catch (error) {
+    console.error('Registration failed:', error.message);
+    res.send(false)
+  } finally {
+    // 关闭数据库连接
+    // client.close();
+  }
+})
 
 // 注册
 const register = async (username, password) => {
@@ -213,8 +246,16 @@ app.post('/register', (req, res) => {
 })
 
 // 查看所有用户
-app.get('/check_all_users', (req, res) => {
+app.get('/query_all_users', (req, res) => {
   db.collection('users').find({}).toArray().then(data => {
+    res.send(data)
+  })
+})
+
+// 查看所有群
+app.get('/query_all_groups', (req, res) => {
+  db.collection('groups').find({}).toArray().then(data => {
+    
     res.send(data)
   })
 })
@@ -352,6 +393,6 @@ app.post('/login', (req, res) => {
 
 
 
-http.listen(3001, function() {
-  console.log('listening on 3001')
+http.listen(3333, function() {
+  console.log('listening on 3333')
 })
