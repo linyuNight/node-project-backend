@@ -92,16 +92,80 @@ io.on('connection', (socket) => {
     }
   });
 
-  // 处理客户端发送的消息
-  socket.on('message', (data) => {
+  // 删除一条消息
+  socket.on('delete_message', async (data) => {
     // let group = users.find(val => {
     //   return val.id == socket.id
     // }).group
 
     // db.collection('users').insertOne(newUser);
+    console.log('测试data', data)
+    try {
+      // 检查用户名是否已存在
+      const result = await db.collection('groups').updateOne(
+        { 
+          groupname: data.groupname
+        },
+        {
+          $pull: {
+            messages: {
+              id: new ObjectId(data.id)
+            }
+          }
+        }
+      );
+
+      console.log('插入message', result)
+    } catch (error) {
+      console.error('Registration failed:', error.message);
+    } finally {
+      // 关闭数据库连接
+      // client.close();
+    }
 
     console.log('测试message data', data)
-    io.to(data.group).emit('message', {
+    io.to(data.groupname).emit('delete_message', {
+      id: data.id
+    });
+  });
+
+  // 处理客户端发送的消息
+  socket.on('message', async (data) => {
+    // let group = users.find(val => {
+    //   return val.id == socket.id
+    // }).group
+
+    // db.collection('users').insertOne(newUser);
+    console.log('测试data', data)
+    try {
+      // 检查用户名是否已存在
+      const result = await db.collection('groups').updateOne(
+        { 
+          groupname: data.groupname
+        },
+        {
+          $push: {
+            messages: {
+              id: new ObjectId(),
+              username: data.username,
+              // 目前userid没多大用
+              userid: data.userid,
+              message: data.message
+            }
+          }
+        }
+      );
+
+      console.log('插入message', result)
+    } catch (error) {
+      console.error('Registration failed:', error.message);
+    } finally {
+      // 关闭数据库连接
+      // client.close();
+    }
+
+    console.log('测试message data', data)
+    io.to(data.groupname).emit('message', {
       username: data.username,
       // 目前userid没多大用
       userid: data.userid,
@@ -122,7 +186,7 @@ io.on('connection', (socket) => {
 
 
 // mongo数据库
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const url = 'mongodb://localhost:27017';
 const client = new MongoClient(url);
 client.connect();
@@ -180,6 +244,63 @@ app.post('/create_group', async (req, res) => {
   }
 })
 
+// 查询群信息
+app.post('/query_group', async (req, res) => {
+  console.log('测试req.body123123', req.body)
+  try {
+    // 检查组名是否已存在
+    const existingGroup = await db.collection('groups').findOne({ 
+      groupname: req.body.groupname
+    });
+
+    // console.log('测试群信息', existingGroup)
+    if (existingGroup) {
+      res.send(existingGroup)
+    } else {
+      res.send(false)
+    }
+  } catch (error) {
+    console.error('Registration failed:', error.message);
+    res.send(false)
+  } finally {
+    // 关闭数据库连接
+    // client.close();
+  }
+})
+
+// 删除一条群消息
+// app.post('/delete_group_message', async (req, res) => {
+//   console.log('测试req.body6666', req.body)
+//   try {
+//     // 检查组名是否已存在
+//     const result = await db.collection('groups').updateOne(
+//       { 
+//         groupname: req.body.groupname
+//       },
+//       {
+//         $pull: {
+//           messages: {
+//             id: new ObjectId(req.body.id)
+//           }
+//         }
+//       }
+//     );
+
+//     // console.log('测试删除消息', result)
+//     if (result) {
+//       res.send(true)
+//     } else {
+//       res.send(false)
+//     }
+//   } catch (error) {
+//     console.error('删除失败:', error.message);
+//     res.send(false)
+//   } finally {
+//     // 关闭数据库连接
+//     // client.close();
+//   }
+// })
+
 // 注册
 const register = async (username, password) => {
   try {
@@ -226,7 +347,7 @@ const login = async (username, password) => {
       throw new Error('Username not exists');
     }
   } catch (error) {
-    console.error('Registration failed:', error.message);
+    console.error('登录失败:', error.message);
   } finally {
     // 关闭数据库连接
     // client.close();
