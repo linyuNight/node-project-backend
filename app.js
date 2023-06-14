@@ -137,6 +137,8 @@ io.on('connection', (socket) => {
 
     // db.collection('users').insertOne(newUser);
     console.log('测试data', data)
+    let id = new ObjectId()
+    
     try {
       // 检查用户名是否已存在
       const result = await db.collection('groups').updateOne(
@@ -146,7 +148,7 @@ io.on('connection', (socket) => {
         {
           $push: {
             messages: {
-              id: new ObjectId(),
+              id: id,
               username: data.username,
               // 目前userid没多大用
               userid: data.userid,
@@ -166,6 +168,7 @@ io.on('connection', (socket) => {
 
     console.log('测试message data', data)
     io.to(data.groupname).emit('message', {
+      id: id,
       username: data.username,
       // 目前userid没多大用
       userid: data.userid,
