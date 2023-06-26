@@ -29,7 +29,8 @@ app.use(bodyParser.json());
 console.log('测试env', process.env.NODE_ENV)
 
 // 客户端
-let clientUrl = 'https://bibibi.website'
+// let clientUrl = 'https://bibibi.website'
+let clientUrl = '*'
 
 // 跨域
 app.use(cors({
@@ -350,9 +351,13 @@ const register = async (username, password) => {
 
 // 登录
 const login = async (username, password) => {
+  console.log(' 测试 username',username)
+  console.log(' 测试 password',password)
   try {
     // 检查用户名是否已存在
     const user = await db.collection('users').findOne({ username });
+
+    console.log(' 测试 user',user)
 
     if (user) {
       let isTrue = bcrypt.compareSync(password, user.password)
@@ -417,6 +422,7 @@ app.get('/current_user', async (req, res) => {
 
 // 登录
 app.post('/login', (req, res) => {
+  console.log('req.body', req.body)
   login(req.body.username, req.body.password).then(data => {
     if(data) {
       let username = data
