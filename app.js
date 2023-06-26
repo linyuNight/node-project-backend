@@ -18,7 +18,7 @@ console.log('测试env', process.env.NODE_ENV)
 
 let isPro = process.env.NODE_ENV === 'pro'
 // 客户端
-let clientUrl = 'http://103.152.132.60:3000'
+let clientUrl = 'https://103.152.132.60:443'
 
 // 跨域
 app.use(cors({
