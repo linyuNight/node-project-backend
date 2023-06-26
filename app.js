@@ -33,7 +33,10 @@ let clientUrl = 'https://bibibi.website'
 
 // 跨域
 app.use(cors({
-  origin: isPro ? clientUrl : "*"
+  origin: isPro ? clientUrl : "*",
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // 允许的请求方法
+  allowedHeaders: ['Content-Type', 'Authorization'], // 允许的请求头
+  credentials: true // 允许携带认证信息（如 Cookies）
 }));
 // token验证中间件
 app.use(authMiddleware);
