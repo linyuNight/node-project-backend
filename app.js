@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 console.log('测试env', process.env.NODE_ENV)
 
 // 客户端
-let clientUrl = 'https://103.152.132.60:443'
+let clientUrl = 'https://bibibi.website'
 
 // 跨域
 app.use(cors({
