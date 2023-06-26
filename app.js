@@ -9,16 +9,18 @@ const authMiddleware = require('./utils/authMiddleware');
 const { tokenKey } = require('./config/index.js')
 // var http = require('http').Server(app)
 
+let isPro = process.env.NODE_ENV === 'pro'
+
 // require('./mysql.js');
 // require('./mongodb.js');
 
 // 配置 SSL 证书和私钥的路径
 const options = {
-  cert: fs.readFileSync('/etc/letsencrypt/live/bibibi.website/fullchain.pem'),
-  key: fs.readFileSync('/etc/letsencrypt/live/bibibi.website/privkey.pem'),
+  cert: isPro ? fs.readFileSync('/etc/letsencrypt/live/bibibi.website/fullchain.pem'): '',
+  key: isPro ? fs.readFileSync('/etc/letsencrypt/live/bibibi.website/privkey.pem'): '',
 };
 
-var http = require('https').createServer(options, app)
+var http = isPro ? require('https').createServer(options, app) : require('http').Server(app) 
 
 // post数据处理
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -26,7 +28,6 @@ app.use(bodyParser.json());
 
 console.log('测试env', process.env.NODE_ENV)
 
-let isPro = process.env.NODE_ENV === 'pro'
 // 客户端
 let clientUrl = 'https://103.152.132.60:443'
 
@@ -34,6 +35,7 @@ let clientUrl = 'https://103.152.132.60:443'
 app.use(cors({
   origin: isPro ? clientUrl : "*"
 }));
+// token验证中间件
 app.use(authMiddleware);
 
 const { Server } = require("socket.io");
