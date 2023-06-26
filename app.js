@@ -1,4 +1,5 @@
 // var express = require('express');
+const fs = require('fs');
 var app = require('express')();
 const cors = require('cors');
 const bcrypt = require('bcrypt');
@@ -6,9 +7,18 @@ const bodyParser = require('body-parser');
 const jwt = require("jsonwebtoken");
 const authMiddleware = require('./utils/authMiddleware');
 const { tokenKey } = require('./config/index.js')
-var http = require('http').Server(app)
+// var http = require('http').Server(app)
+
 // require('./mysql.js');
 // require('./mongodb.js');
+
+// 配置 SSL 证书和私钥的路径
+const options = {
+  cert: fs.readFileSync('/etc/letsencrypt/live/bibibi.website/fullchain.pem'),
+  key: fs.readFileSync('/etc/letsencrypt/live/bibibi.website/privkey.pem'),
+};
+
+var http = require('https').createServer(options, app)
 
 // post数据处理
 app.use(bodyParser.urlencoded({ extended: false }));
