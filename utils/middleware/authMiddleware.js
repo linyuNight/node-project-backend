@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { tokenKey } = require('../config/index.js')
+const { tokenKey } = require('../../config/index.js')
 const passUrls = ['/login', '/register']
 
 // 定义中间件函数
