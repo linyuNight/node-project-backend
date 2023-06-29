@@ -48,6 +48,8 @@ const upload = (isPro, app) => {
       const file = req.file
       console.log('上传文件信息', file)
 
+      console.log('测试zzzzisPro1', isPro)
+
       const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
       const targetPath = path.join(__dirname, uploadFolder);
       deleteFolderRecursive(targetPath)
@@ -62,7 +64,7 @@ const upload = (isPro, app) => {
       const unlinkPath = path.join(__dirname, `../../../uploads/${file.filename}`)
       fs.unlinkSync(unlinkPath)
 
-      console.log('测试zzzzisPro', isPro)
+      console.log('测试zzzzisPro2', isPro)
 
       if(isPro) {
         console.log('zzzz')
