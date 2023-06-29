@@ -62,6 +62,7 @@ const upload = (isPro, app) => {
     fs.unlinkSync(unlinkPath)
 
     if(isPro) {
+      console.log('zzzz')
       const command = 'sudo systemctl restart nginx';
 
       exec(command, (error, stdout, stderr) => {
