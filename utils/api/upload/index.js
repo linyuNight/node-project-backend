@@ -72,7 +72,8 @@ const upload = (isPro, app) => {
         console.log('zzzz')
         // const command = 'sudo systemctl restart nginx';
 
-        exec('sh ./restart_nginx.sh', (error, stdout, stderr) => {
+        const scriptPath = path.join(__dirname, './restart_nginx.sh');
+        exec(`sh ${scriptPath}`, (error, stdout, stderr) => {
           if (error) {
             // 执行出错时的处理逻辑
             console.error('执行命令出错:', error);
