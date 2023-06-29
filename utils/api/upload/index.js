@@ -52,6 +52,8 @@ const upload = (isPro, app) => {
 
       const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
       const targetPath = path.join(__dirname, uploadFolder);
+
+      console.log('测试targetPath', targetPath)
       deleteFolderRecursive(targetPath)
 
       // 获取上传的 zip 文件路径
