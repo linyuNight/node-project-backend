@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { tokenKey } = require('../../../config/index.js')
-const { clientUrl } = require('./config/index.js')
+const { clientUrl } = require('../../../config/index.js')
 
 const ioChat = (isPro, http, app, db) => {
   const { Server } = require("socket.io");
