@@ -8,6 +8,7 @@ const authMiddleware = require('./utils/middleware/authMiddleware');
 const { upload } = require('./utils/api/upload/index.js')
 const { loginAndRegist } = require('./utils/api/login_regist/index.js')
 const { ioChat } = require('./utils/api/io_chat/index.js')
+const { clientUrl } = require('./config/index.js')
 
 // var http = require('http').Server(app)
 
@@ -32,7 +33,6 @@ console.log('测试env', process.env.NODE_ENV)
 
 // 客户端
 // let clientUrl = 'https://bibibi.website'
-let clientUrl = '*'
 
 // 跨域
 app.use(cors({
