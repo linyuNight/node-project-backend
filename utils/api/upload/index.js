@@ -61,6 +61,8 @@ const upload = (isPro, app) => {
     const unlinkPath = path.join(__dirname, `../../../uploads/${file.filename}`)
     fs.unlinkSync(unlinkPath)
 
+    console.log('测试zzzzisPro', isPro)
+
     if(isPro) {
       console.log('zzzz')
       const command = 'sudo systemctl restart nginx';
