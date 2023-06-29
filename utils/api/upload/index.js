@@ -50,7 +50,8 @@ const upload = (isPro, app) => {
 
       console.log('测试zzzzisPro1', isPro)
 
-      const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
+      // const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
+      const uploadFolder = '../../../uploads/extracted'
       const targetPath = path.join(__dirname, uploadFolder);
 
       console.log('测试targetPath', targetPath)
@@ -68,27 +69,28 @@ const upload = (isPro, app) => {
 
       console.log('测试zzzzisPro2', isPro)
 
-      if(isPro) {
-        console.log('zzzz')
-        // const command = 'sudo systemctl restart nginx';
+      // if(isPro) {
+      //   console.log('zzzz')
+      //   // const command = 'sudo systemctl restart nginx';
 
-        const scriptPath = path.join(__dirname, './restart_nginx.sh');
-        exec(`sh ${scriptPath}`, (error, stdout, stderr) => {
-          if (error) {
-            // 执行出错时的处理逻辑
-            console.error('执行命令出错:', error);
-            res.status(500).send('执行命令出错');
-            return;
-          }
+      //   const scriptPath = path.join(__dirname, './restart_nginx.sh');
+      //   exec(`sh ${scriptPath}`, (error, stdout, stderr) => {
+      //     if (error) {
+      //       // 执行出错时的处理逻辑
+      //       console.error('执行命令出错:', error);
+      //       res.status(500).send('执行命令出错');
+      //       return;
+      //     }
       
-          // 执行成功时的处理逻辑
-          console.log('命令执行结果:', stdout);
-          res.status(200).send('命令执行成功');
-        });
-      } else {
-        // 返回解压成功的响应
-        res.send('文件上传和解压成功');
-      }
+      //     // 执行成功时的处理逻辑
+      //     console.log('命令执行结果:', stdout);
+      //     res.status(200).send('命令执行成功');
+      //   });
+      // } else {
+      //   // 返回解压成功的响应
+      //   res.send('文件上传和解压成功');
+      // }
+      res.send('文件上传和解压成功');
     } catch (err) {
       console.log('测试uploadErr', err)
     }        
