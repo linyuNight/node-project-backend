@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const bodyParser = require('body-parser');
 const authMiddleware = require('./utils/middleware/authMiddleware');
-const { upload } = require('./utils/api/upload/index.js')
+const { uploadDeploy } = require('./utils/api/upload_deploy/index.js')
 const { loginAndRegist } = require('./utils/api/login_regist/index.js')
 const { ioChat } = require('./utils/api/io_chat/index.js')
 const { clientUrl } = require('./config/index.js')
@@ -45,7 +45,7 @@ app.use(cors({
 app.use(authMiddleware);
 
 // mongo数据库
-const { MongoClient, ObjectId } = require('mongodb');
+const { MongoClient } = require('mongodb');
 const url = 'mongodb://localhost:27017';
 const client = new MongoClient(url);
 client.connect();
@@ -54,7 +54,7 @@ const db = client.db('myProject');
 // const collection = db.collection('documents');
 
 // 上传
-upload(isPro, app)
+uploadDeploy(isPro, app)
 
 // 登录和注册
 loginAndRegist(app, db)
@@ -64,6 +64,7 @@ ioChat(isPro, http, app, db)
 
 // app.use(express.static('uploads/extracted/dist'));
 
+// 网络测试接口
 app.get('/aaa', (req, res) => {
   res.send('success123')
 })

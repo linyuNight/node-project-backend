@@ -41,7 +41,7 @@ function deleteFolderRecursive(path) {
   }
 }
 
-const upload = (isPro, app) => {
+const uploadDeploy = (isPro, app) => {
   // 处理文件上传的路由
   app.post('/upload', uploadInstance.single('file'), (req, res) => {
     try {
@@ -162,5 +162,5 @@ const upload = (isPro, app) => {
 }
 
 module.exports = {
-  upload
+  uploadDeploy
 }
