@@ -14,6 +14,7 @@
     "startForeverDev": "NODE_ENV=dev forever start app.js",
     "startForeverPro": "NODE_ENV=pro forever start app.js",
     "stopForever": "forever stop app.js",
+    "startNodeDev": "NODE_ENV=dev node app.js",
     "startNodePro": "NODE_ENV=pro node app.js"
   },
   "keywords": [],

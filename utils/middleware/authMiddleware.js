@@ -4,7 +4,7 @@ const passUrls = ['/login', '/register']
 
 // 定义中间件函数
 const authMiddleware = (req, res, next) => {
-  if(passUrls.includes(req.url)) {
+  if(passUrls.includes(req.url.split('?')[0])) {
     next()
   } else {
     // 从请求头中获取 Authorization 标头

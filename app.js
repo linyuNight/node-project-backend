@@ -6,6 +6,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const authMiddleware = require('./utils/middleware/authMiddleware');
 const { uploadDeploy } = require('./utils/api/upload_deploy/index.js')
+const { cloudData } = require('./utils/api/cloud_data/index.js')
 const { loginAndRegist } = require('./utils/api/login_regist/index.js')
 const { ioChat } = require('./utils/api/io_chat/index.js')
 const { clientUrl } = require('./config/index.js')
@@ -55,6 +56,9 @@ const db = client.db('myProject');
 
 // 上传
 uploadDeploy(isPro, app)
+
+// 云数据
+cloudData(isPro, app)
 
 // 登录和注册
 loginAndRegist(app, db)

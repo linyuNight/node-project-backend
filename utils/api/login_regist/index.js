@@ -16,7 +16,10 @@ const loginAndRegist = (app, db) => {
       if (user) {
         let isTrue = bcrypt.compareSync(password, user.password)
         if(isTrue) {
-          return username
+          return {
+            userid: user._id,
+            username: user.username
+          }
         } else {
           return false
         }
@@ -65,12 +68,12 @@ const loginAndRegist = (app, db) => {
     console.log('req.body', req.body)
     login(req.body.username, req.body.password).then(data => {
       if(data) {
-        let username = data
         const token = jwt.sign({
           user: {
-            username: username
+            username: data.username,
+            userid: data.userid
           }
-        }, tokenKey, { expiresIn: "3h" });
+        }, tokenKey, { expiresIn: "12h" });
         res.send({
           token: token
         })
