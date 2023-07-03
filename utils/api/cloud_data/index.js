@@ -28,6 +28,58 @@ const storage = multer.diskStorage({
 
 const uploadInstance = multer({ storage: storage });
 
+
+// 文件类型与 MIME 类型的映射关系
+const mimeTypes = {
+  'txt': 'text/plain',
+  'html': 'text/html',
+  'css': 'text/css',
+  'js': 'application/javascript',
+  'jpg': 'image/jpeg',
+  'jpeg': 'image/jpeg',
+  'png': 'image/png',
+  'gif': 'image/gif',
+  'svg': 'image/svg+xml',
+  'bmp': 'image/bmp',
+  'mp3': 'audio/mpeg',
+  'wav': 'audio/wav',
+  'ogg': 'audio/ogg',
+  'mp4': 'video/mp4',
+  'avi': 'video/x-msvideo',
+  'mkv': 'video/x-matroska',
+  'zip': 'application/zip',
+  'tar': 'application/x-tar',
+  'gz': 'application/gzip',
+  'pdf': 'application/pdf',
+  'doc': 'application/msword',
+  'docx': 'application/msword',
+  'xls': 'application/vnd.ms-excel',
+  'xlsx': 'application/vnd.ms-excel',
+  'ppt': 'application/vnd.ms-powerpoint',
+  'pptx': 'application/vnd.ms-powerpoint',
+};
+
+// 获取文件扩展名
+function getFileExtension(filename) {
+  // return filename.slice((filename.lastIndexOf('.') - 1 >>> 0) + 2);
+  let tempList = filename.split('.')
+  return tempList[tempList.length - 1];
+}
+
+// 根据文件扩展名获取对应的 MIME 类型
+function getMimeType(filename) {
+  const ext = getFileExtension(filename);
+  console.log('测试ext', ext)
+  return mimeTypes[ext] || 'application/octet-stream';
+}
+
+// 设置文件下载的 Content-Type
+function setFileContentType(filename, res) {
+  const mimeType = getMimeType(filename);
+  res.setHeader('Content-Type', mimeType);
+}
+
+
 const cloudData = (isPro, app) => {
   // 处理文件上传的路由
   app.post('/upload_clound_data', uploadInstance.single('file'), (req, res) => {
@@ -43,8 +95,17 @@ const cloudData = (isPro, app) => {
         console.error(err);
         res.status(500).json({ error: 'Failed to read folder' });
       } else {
+        let list = files.map(val => {
+          const isFile = fs.statSync(path.join(folderPath, val)).isFile();
+
+          return {
+            name: val,
+            isFile: isFile
+          }
+        })
+
         // 返回文件名列表给前端
-        res.json({ files });
+        res.json({ files: list });
       }
     });
   });
@@ -54,17 +115,20 @@ const cloudData = (isPro, app) => {
     if(req.query.userid !== req.decoded.user.userid) {
       return res.send('token校验失败')
     }
+
+    const filename = req.query.filename
     // console.log('测试decoded',req)
     // return res.send(123)
     // 获取要下载的文件路径
-    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}/${req.query.filename}`);
+    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}/${filename}`);
   
     // 设置响应头，指定文件类型和下载的文件名
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${req.query.filename}"`); // 替换为要下载的文件名
+    // res.setHeader('Content-Type', 'application/octet-stream');
+    setFileContentType(filename, res)
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`); // 替换为要下载的文件名
   
     // // 发送文件给客户端
-    // res.sendFile(filePath);
+    // res.sendFile(filePath);  
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
