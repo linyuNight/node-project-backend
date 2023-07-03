@@ -133,6 +133,22 @@ const cloudData = (isPro, app) => {
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
   });
+
+  app.get('/video', (req, res) => {
+    console.log('测试参数', req.decoded)
+    if(req.query.userid !== req.decoded.user.userid) {
+      return res.send('token校验失败')
+    }
+
+    const filename = req.query.filename
+    // 获取要下载的文件路径
+    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}/${filename}`);
+  
+    res.setHeader('Content-Type', 'video/mp4');
+
+    const videoStream = fs.createReadStream(filePath);
+    videoStream.pipe(res);
+  });
 }
 
 module.exports = {
