@@ -96,11 +96,11 @@ const cloudData = (isPro, app) => {
         res.status(500).json({ error: 'Failed to read folder' });
       } else {
         let list = files.map(val => {
-          const isFile = fs.statSync(path.join(folderPath, val)).isFile();
+          // const isFile = fs.statSync(path.join(folderPath, val)).isFile();
 
           return {
-            name: val,
-            isFile: isFile
+            name: val
+            // isFile: isFile
           }
         })
 
