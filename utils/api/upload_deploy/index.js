@@ -1,5 +1,4 @@
 const multer = require('multer');
-// const path = require('path');
 const AdmZip = require('adm-zip');
 const { exec } = require('child_process');
 const fs = require('fs');
@@ -154,7 +153,6 @@ const uploadDeploy = (isPro, app) => {
       console.log('测试uploadErr', err)
     }        
   });
-
   // app.get('/yyy', (req, res) => {
   //   // 文件上传成功
   //   res.send('文件上传成功');

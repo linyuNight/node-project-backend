@@ -1,7 +1,4 @@
 const multer = require('multer');
-// const path = require('path');
-const AdmZip = require('adm-zip');
-const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -89,6 +86,15 @@ const cloudData = (isPro, app) => {
   app.get('/query_clound_data', (req, res) => {    
     const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`);
   
+    // 检查文件夹是否存在
+    if (!fs.existsSync(folderPath)) {
+      // 创建文件夹
+      fs.mkdirSync(folderPath);
+      console.log('文件夹创建成功');
+    } else {
+      console.log('文件夹已存在');
+    }
+
     // 读取文件夹中的所有文件
     fs.readdir(folderPath, (err, files) => {
       if (err) {
@@ -149,6 +155,50 @@ const cloudData = (isPro, app) => {
     const videoStream = fs.createReadStream(filePath);
     videoStream.pipe(res);
   });
+
+  // const WebTorrent = require('webtorrent')
+
+  // const client = new WebTorrent()
+
+  // const magnetURI = 'magnet:?xt=urn:btih:af9d86e8786ca73e714a4b50a6d258daabc243dd'
+
+  // const folderPath = path.join(__dirname, `../../../uploads`);
+
+  // client.add(magnetURI, { path: folderPath }, function (torrent) {
+  //   torrent.on('done', function () {
+  //     console.log('torrent download finished')
+  //   })
+  // })
+
+  app.post('/magnet_link_download', (req, res) => {
+    import('webtorrent-hybrid').then(({ default: WebTorrent }) => {
+      // console.log('测试WebTorrent', WebTorrent)
+
+      const magnetLink = req.body.link;
+      const client = new WebTorrent();
+
+      console.log('测试magnetLink', magnetLink)
+  
+      const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.decoded.user.userid}`);
+      client.add(magnetLink, { path: folderPath }, torrent => {
+        console.log('测试torrent', torrent)
+
+        // 监听下载进度
+        torrent.on('download', (bytesDownloaded, bytesRemaining) => {
+          const progress = (bytesDownloaded / torrent.length * 100).toFixed(2);
+          console.log('Progress: ' + progress + '%');
+        });
+        
+        // 下载完成后的处理
+        torrent.on('done', () => {
+          console.log('Download completed');
+          client.destroy(); // 关闭 WebTorrent 客户端
+          res.send('File downloaded successfully');
+        });
+      });
+    });
+    
+  })
 }
 
 module.exports = {
