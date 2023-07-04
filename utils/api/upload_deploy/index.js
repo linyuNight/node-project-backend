@@ -168,7 +168,7 @@ const uploadDeploy = (isPro, app) => {
           return;
         }
   
-        exec(`sh ${path.join(__dirname, './stop_forever.sh')}`, (error, stdout, stderr) => {
+        exec(`sh ${path.join(__dirname, './restart_forever.sh')}`, (error, stdout, stderr) => {
           if (error) {
             // 执行出错时的处理逻辑
             console.error('执行命令出错:', error);
@@ -176,18 +176,9 @@ const uploadDeploy = (isPro, app) => {
             return;
           }
     
-          exec(`sh ${path.join(__dirname, './start_forever.sh')}`, (error, stdout, stderr) => {
-            if (error) {
-              // 执行出错时的处理逻辑
-              console.error('执行命令出错:', error);
-              res.status(500).send('执行命令出错');
-              return;
-            }
-      
-            // 执行成功时的处理逻辑
-            console.log('命令执行结果:', stdout);
-            res.status(200).send('命令执行成功');
-          });
+          // 执行成功时的处理逻辑
+          console.log('命令执行结果:', stdout);
+          res.status(200).send('命令执行成功');
         });
       });
     } else {
