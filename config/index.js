@@ -1,4 +1,5 @@
 module.exports = {
   tokenKey: 'token-ly',
-  clientUrl: '*'
+  // clientUrl: '*'
+  clientUrl: 'https://bibibi.website'
 }
