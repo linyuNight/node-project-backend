@@ -32,9 +32,6 @@ app.use(bodyParser.json());
 
 console.log('测试env', process.env.NODE_ENV)
 
-// 客户端
-// let clientUrl = 'https://bibibi.website'
-
 // 跨域
 app.use(cors({
   origin: isPro ? clientUrl : "*",
