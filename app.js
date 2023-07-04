@@ -67,7 +67,7 @@ ioChat(isPro, http, app, db)
 
 // 网络测试接口
 app.get('/aaa', (req, res) => {
-  res.send('success1234')
+  res.send('success12345')
 })
 
 // 检查当前用户
