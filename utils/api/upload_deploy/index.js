@@ -168,7 +168,7 @@ const uploadDeploy = (isPro, app) => {
           return;
         }
   
-        exec(`sh ${path.join(__dirname, './restart_forever.sh')}`, (error, stdout, stderr) => {
+        exec(`sh ${path.join(__dirname, isPro ? './restart_forever.sh' : './restart_forever_dev.sh')}`, (error, stdout, stderr) => {
           if (error) {
             // 执行出错时的处理逻辑
             console.error('执行命令出错:', error);
