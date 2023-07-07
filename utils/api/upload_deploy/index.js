@@ -41,7 +41,7 @@ function deleteFolderRecursive(path) {
 }
 
 const uploadDeploy = (isPro, app) => {
-  // 处理文件上传的路由
+  // 处理pc文件上传的路由
   app.post('/upload', uploadInstance.single('file'), (req, res) => {
     try {
       const file = req.file
@@ -97,7 +97,7 @@ const uploadDeploy = (isPro, app) => {
     }        
   });
 
-  // 处理文件上传的路由
+  // 处理mobile文件上传的路由
   app.post('/upload_mobile', uploadInstance.single('file'), (req, res) => {
     try {
       const file = req.file
