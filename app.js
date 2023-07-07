@@ -63,7 +63,7 @@ loginAndRegist(app, db)
 // 聊天接口
 ioChat(isPro, http, app, db)
 
-// app.use(express.static('uploads/extracted/dist'));
+// app.use(express.static('public'));
 
 // 网络测试接口
 app.get('/aaa', (req, res) => {

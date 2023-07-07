@@ -24,6 +24,7 @@ const ioChat = (isPro, http, app, db) => {
   // 存储用户和对应的分组信息
   // const users = [];
 
+  // 验证socket token
   io.use((socket, next) => {
     // 获取客户端传递的 token
     const token = socket.handshake.auth.token;

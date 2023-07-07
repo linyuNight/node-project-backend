@@ -97,6 +97,61 @@ const uploadDeploy = (isPro, app) => {
     }        
   });
 
+  // 处理文件上传的路由
+  app.post('/upload_mobile', uploadInstance.single('file'), (req, res) => {
+    try {
+      const file = req.file
+      console.log('上传文件信息', file)
+
+      console.log('测试zzzzisPro1', isPro)
+
+      // const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
+      // const uploadFolder = '../../../uploads/extracted'
+      // const uploadFolder = '/Users/laurent.lin/Desktop/linyu/learn/node/node-project-frontend/dist'
+
+      // 解压后的目标路径
+      // const targetPath = path.join(__dirname, uploadFolder);
+      const targetPath = isPro ? '/usr/share/nginx/html/node-project-mobile' : '/Users/laurent.lin/Desktop/linyu/learn/node/node-project-frontend/dist'
+
+      console.log('测试targetPath', targetPath)
+      deleteFolderRecursive(targetPath)
+
+      // 获取上传的 zip 文件路径
+      const filePath = file.path;
+
+      // 使用 adm-zip 库解压文件
+      const zip = new AdmZip(filePath);
+      zip.extractAllTo(targetPath, true);
+      const unlinkPath = path.join(__dirname, `../../../uploads/${file.filename}`)
+      fs.unlinkSync(unlinkPath)
+
+      // console.log('测试zzzzisPro2', isPro)
+
+      if(isPro) {
+        console.log('zzzz')
+        // const command = 'sudo systemctl restart nginx';
+
+        const scriptPath = path.join(__dirname, './restart_nginx.sh');
+        exec(`sh ${scriptPath}`, (error, stdout, stderr) => {
+          if (error) {
+            // 执行出错时的处理逻辑
+            console.error('执行命令出错:', error);
+            res.status(500).send('执行命令出错');
+            return;
+          }
+      
+          // 执行成功时的处理逻辑
+          console.log('命令执行结果:', stdout);
+          res.status(200).send('命令执行成功');
+        });
+      } else {
+        // 返回解压成功的响应
+        res.send('文件上传和解压成功');
+      }
+    } catch (err) {
+      console.log('测试uploadErr', err)
+    }        
+  });
 
   // 处理文件上传的路由
   app.post('/upload_manager', uploadInstance.single('file'), (req, res) => {
