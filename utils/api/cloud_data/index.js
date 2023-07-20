@@ -4,9 +4,9 @@ const path = require('path');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log('ffff', req.body.userid)
+    console.log('ffff', req.body)
 
-    const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.body.userid}`);
+    const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.body.userid}`, req.body.path ? req.body.path : '');
 
     if (!fs.existsSync(folderPath)) {
       // 创建文件夹
@@ -14,16 +14,18 @@ const storage = multer.diskStorage({
     }
 
     // 指定文件存储的目录
-    cb(null, path.join(__dirname, `../../../uploads/cloud_data/${req.body.userid}/`));
+    cb(null, path.join(__dirname, `../../../uploads/cloud_data/${req.body.userid}/`, req.body.path ? req.body.path : ''));
   },
   filename: function (req, file, cb) {
     console.log('tttt', file)
     // 指定文件名
-    cb(null, file.originalname);
+    cb(null, Buffer.from(file.originalname,"latin1").toString("utf8"));
   }
 });
 
-const uploadInstance = multer({ storage: storage });
+const uploadInstance = multer({ 
+  storage: storage,
+});
 
 
 // 文件类型与 MIME 类型的映射关系
@@ -78,14 +80,33 @@ function setFileContentType(filename, res) {
 
 
 const cloudData = (isPro, app) => {
-  // 处理文件上传的路由
+  // 创建文件夹
+  app.post('/create_clound_data_folder', (req, res) => {
+    console.log(req.body.folderPath)
+
+    const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.decoded.user.userid}`, req.body.folderPath);
+    
+    // 检查文件夹是否存在
+    if (!fs.existsSync(folderPath)) {
+      // 创建文件夹
+      fs.mkdirSync(folderPath);
+      res.send('文件夹创建成功');
+    } else {
+      res.send('文件夹已存在');
+    }
+  })
+
+  // 上传文件
   app.post('/upload_clound_data', uploadInstance.single('file'), (req, res) => {
     res.send('文件上传成功');      
   });
 
-  app.get('/query_clound_data', (req, res) => {    
-    const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`);
+  // 查询已经上传的文件列表
+  app.get('/query_clound_data', (req, res) => {  
+    // console.log('测试req.query.path', Boolean(req.query.path))
+    const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`, req.query.path ? req.query.path : '');
   
+    console.log('测试folderPath', folderPath)
     // 检查文件夹是否存在
     if (!fs.existsSync(folderPath)) {
       // 创建文件夹
@@ -102,11 +123,11 @@ const cloudData = (isPro, app) => {
         res.status(500).json({ error: 'Failed to read folder' });
       } else {
         let list = files.map(val => {
-          // const isFile = fs.statSync(path.join(folderPath, val)).isFile();
+          const isFile = fs.statSync(path.join(folderPath, val)).isFile();
 
           return {
-            name: val
-            // isFile: isFile
+            name: val,
+            isFile: isFile == true ? 1 : 0
           }
         })
 
@@ -116,6 +137,7 @@ const cloudData = (isPro, app) => {
     });
   });
 
+  // 下载文件
   app.get('/download_clound_file', (req, res) => {
     console.log('测试参数', req.decoded)
     if(req.query.userid !== req.decoded.user.userid) {
@@ -123,16 +145,18 @@ const cloudData = (isPro, app) => {
     }
 
     const filename = req.query.filename
-    // console.log('测试decoded',req)
+    console.log('测试req.query 123',req.query)
     // return res.send(123)
     // 获取要下载的文件路径
-    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}/${filename}`);
-  
+    const filePath = path.join(__dirname, `../../../uploads/cloud_data`, req.query.userid, req.query.path ? req.query.path : '', filename);
+    console.log('测试filePath',filePath)
+
     // 设置响应头，指定文件类型和下载的文件名
     // res.setHeader('Content-Type', 'application/octet-stream');
     setFileContentType(filename, res)
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`); // 替换为要下载的文件名
-  
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`); // 替换为要下载的文件名
+    res.setHeader('Content-Encoding', 'UTF-8');
+
     // // 发送文件给客户端
     // res.sendFile(filePath);  
 
@@ -148,8 +172,9 @@ const cloudData = (isPro, app) => {
 
     const filename = req.query.filename
     // 获取要下载的文件路径
-    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}/${filename}`);
-  
+    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`, req.query.path ? req.query.path : 0, filename);
+    console.log('测试播放filePath', filePath)
+
     res.setHeader('Content-Type', 'video/mp4');
 
     const videoStream = fs.createReadStream(filePath);
@@ -170,6 +195,33 @@ const cloudData = (isPro, app) => {
   //   })
   // })
 
+  // 删除文件或文件夹
+  app.delete('/delete_cloud_file', (req, res) => {    
+    const unlinkPath = path.join(__dirname, `../../../uploads/cloud_data`, req.decoded.user.userid, req.body.path, req.body.file)
+    if (req.body.isFile) {
+      fs.unlink(unlinkPath, (err) => {
+        if (err) {
+          console.error('Error deleting file:', err);
+          res.status(500).send('Error deleting file');
+        } else {
+          console.log('File deleted successfully');
+          res.send('File deleted successfully');
+        }
+      });
+    } else {
+      fs.rmdir(unlinkPath, { recursive: true }, (err) => {
+        if (err) {
+          console.error('Error deleting folder:', err);
+          res.status(500).send('Error deleting folder');
+        } else {
+          console.log('Folder deleted successfully');
+          res.send('Folder deleted successfully');
+        }
+      });
+    }    
+  })
+
+  // 磁力下载到后台
   app.post('/magnet_link_download', (req, res) => {
     import('webtorrent-hybrid').then(({ default: WebTorrent }) => {
       // console.log('测试WebTorrent', WebTorrent)

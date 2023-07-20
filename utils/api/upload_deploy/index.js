@@ -213,6 +213,7 @@ const uploadDeploy = (isPro, app) => {
   //   res.send('文件上传成功');
   // });
 
+  // 更新后台
   app.post('/update_backend', (req, res) => {
     exec(`sh ${path.join(__dirname, './git_pull.sh')}`, (error, stdout, stderr) => {
       if (error) {
