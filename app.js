@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const authMiddleware = require('./utils/middleware/authMiddleware');
 const { uploadDeploy } = require('./utils/api/upload_deploy/index.js')
 const { cloudData } = require('./utils/api/cloud_data/index.js')
+const { music } = require('./utils/api/music/index.js')
 const { loginAndRegist } = require('./utils/api/login_regist/index.js')
 const { ioChat } = require('./utils/api/io_chat/index.js')
 const { clientUrl } = require('./config/index.js')
@@ -56,6 +57,9 @@ uploadDeploy(isPro, app)
 
 // 云数据
 cloudData(isPro, app)
+
+// 音乐
+music(isPro, app)
 
 // 登录和注册
 loginAndRegist(app, db)

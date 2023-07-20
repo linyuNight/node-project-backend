@@ -164,6 +164,7 @@ const cloudData = (isPro, app) => {
     fileStream.pipe(res);
   });
 
+  // 获取视频
   app.get('/video', (req, res) => {
     console.log('测试参数', req.decoded)
     if(req.query.userid !== req.decoded.user.userid) {
