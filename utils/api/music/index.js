@@ -23,13 +23,22 @@ const music = (isPro, app) => {
         console.error(err);
         res.status(500).json({ error: 'Failed to read folder' });
       } else {
+        let list = files.map(val => {
+          const musicinfo = fs.statSync(path.join(folderPath, val));
+
+          return {
+            name: val,
+            size: musicinfo.size
+          }
+        })
+
         // 返回文件名列表给前端
-        res.json({ files });
+        res.json({ files: list });
       }
     });
   });
 
-  // 获取音乐
+  // 播放音乐
   app.get('/music', (req, res) => {
     console.log('测试参数', req.decoded)
     if(req.query.userid !== req.decoded.user.userid) {
@@ -38,13 +47,47 @@ const music = (isPro, app) => {
 
     const filename = req.query.filename
     // 获取要下载的文件路径
-    const filePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`, req.query.path ? req.query.path : 0, filename);
-    console.log('测试播放filePath', filePath)
+    const audioFilePath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`, req.query.path ? req.query.path : 0, filename);
+    console.log('测试播放audioFilePath', audioFilePath)
+    const stat = fs.statSync(audioFilePath);
+    const fileSize = stat.size;
+    console.log('测试req.headers', req.headers)
+    const range = req.headers.range;
 
-    res.setHeader('Content-Type', 'video/mp4');
+    if (range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunkSize = (end - start) + 1;
+      const file = fs.createReadStream(audioFilePath, { start, end });
+  
+      const headers = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunkSize,
+        'Content-Type': 'audio/mpeg', // 根据实际音频类型设置
+      };
+  
+      res.writeHead(206, headers);
+      file.pipe(res);
+    } else {
+      const headers = {
+        'Content-Length': fileSize,
+        'Content-Type': 'audio/mpeg', // 根据实际音频类型设置
+      };
+  
+      res.writeHead(200, headers);
+      fs.createReadStream(audioFilePath).pipe(res);
+    }
 
-    const videoStream = fs.createReadStream(filePath);
-    videoStream.pipe(res);
+
+
+
+
+    // res.setHeader('Content-Type', 'video/mp4');
+
+    // const videoStream = fs.createReadStream(filePath);
+    // videoStream.pipe(res);
   });
 }
 

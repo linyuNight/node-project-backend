@@ -25,7 +25,7 @@ const options = {
   key: isPro ? fs.readFileSync('/etc/letsencrypt/live/bibibi.website/privkey.pem'): '',
 };
 
-var http = isPro ? require('https').createServer(options, app) : require('http').Server(app) 
+var http = isPro ? require('http2').createServer(options, app) : require('http').Server(app) 
 
 // post数据处理
 app.use(bodyParser.urlencoded({ extended: false }));
