@@ -2,6 +2,7 @@ var express = require('express');
 const fs = require('fs');
 var app = require('express')();
 const cors = require('cors');
+const path = require('path');
 
 const bodyParser = require('body-parser');
 const authMiddleware = require('./utils/middleware/authMiddleware');
@@ -67,7 +68,7 @@ loginAndRegist(app, db)
 // 聊天接口
 ioChat(isPro, http, app, db)
 
-// app.use(express.static('uploads'));
+app.use('/music', express.static(path.join(__dirname, 'uploads/music')));
 
 // 网络测试接口
 app.get('/aaa', (req, res) => {

@@ -1,11 +1,37 @@
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    console.log('ffff', req.body)
+
+    const folderPath = path.join(__dirname, '../../../uploads/music');
+
+    // 指定文件存储的目录
+    cb(null, folderPath);
+  },
+  filename: function (req, file, cb) {
+    console.log('tttt', file)
+    // 指定文件名
+    cb(null, Buffer.from(file.originalname,"latin1").toString("utf8"));
+  }
+});
+
+const uploadInstance = multer({ 
+  storage: storage,
+});
+
 const music = (isPro, app) => {
+  // 上传文件
+  app.post('/upload_music', uploadInstance.single('file'), (req, res) => {
+    res.send('文件上传成功');      
+  });
   // 查询音乐列表
   app.get('/query_music', (req, res) => {  
     // console.log('测试req.query.path', Boolean(req.query.path))
-    const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`, 'music');
+    // const folderPath = path.join(__dirname, `../../../uploads/cloud_data/${req.query.userid}`, 'music');
+    const folderPath = path.join(__dirname, '../../../uploads/music');
   
     console.log('测试folderPath', folderPath)
     // 检查文件夹是否存在

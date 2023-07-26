@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const { tokenKey } = require('../../config/index.js')
-const passUrls = ['/login', '/register', '/aaa', '/music']
+const passUrls = ['/login', '/register', '/aaa']
 
 // 定义中间件函数
 const authMiddleware = (req, res, next) => {
-  if(passUrls.includes(req.url.split('?')[0])) {
+  if(passUrls.includes(req.url.split('?')[0]) || req.url.split('?')[0].includes('music')) {
     next()
   } else {
     // 从请求头中获取 Authorization 标头
