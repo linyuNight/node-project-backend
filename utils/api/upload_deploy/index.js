@@ -105,10 +105,6 @@ const uploadDeploy = (isPro, app) => {
 
       console.log('测试zzzzisPro1', isPro)
 
-      // const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
-      // const uploadFolder = '../../../uploads/extracted'
-      // const uploadFolder = '/Users/laurent.lin/Desktop/linyu/learn/node/node-project-frontend/dist'
-
       // 解压后的目标路径
       // const targetPath = path.join(__dirname, uploadFolder);
       const targetPath = isPro ? '/usr/share/nginx/html/node-project-mobile' : '/Users/laurent.lin/Desktop/linyu/learn/node/node-project-frontend/dist'
@@ -160,10 +156,6 @@ const uploadDeploy = (isPro, app) => {
       console.log('上传文件信息', file)
 
       console.log('测试zzzzisPro1', isPro)
-
-      // const uploadFolder = isPro ? '/usr/share/nginx/html/node-project' : '../../../uploads/extracted'
-      // const uploadFolder = '../../../uploads/extracted'
-      // const uploadFolder = '/Users/laurent.lin/Desktop/linyu/learn/node/node-project-frontend/dist'
 
       // 解压后的目标路径
       // const targetPath = path.join(__dirname, uploadFolder);

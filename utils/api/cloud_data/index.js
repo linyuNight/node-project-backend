@@ -250,7 +250,6 @@ const cloudData = (isPro, app) => {
         });
       });
     });
-    
   })
 }
 
