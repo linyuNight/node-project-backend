@@ -52,42 +52,14 @@ const music = (isPro, app) => {
     const stat = fs.statSync(audioFilePath);
     const fileSize = stat.size;
     console.log('测试req.headers', req.headers)
-    const range = req.headers.range;
 
-    if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunkSize = (end - start) + 1;
-      const file = fs.createReadStream(audioFilePath, { start, end });
-  
-      const headers = {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunkSize,
-        'Content-Type': 'audio/mpeg', // 根据实际音频类型设置
-      };
-  
-      res.writeHead(206, headers);
-      file.pipe(res);
-    } else {
-      const headers = {
-        'Content-Length': fileSize,
-        'Content-Type': 'audio/mpeg', // 根据实际音频类型设置
-      };
-  
-      res.writeHead(200, headers);
-      fs.createReadStream(audioFilePath).pipe(res);
-    }
+    const headers = {
+      'Content-Length': fileSize,
+      'Content-Type': 'audio/mpeg', // 根据实际音频类型设置
+    };
 
-
-
-
-
-    // res.setHeader('Content-Type', 'video/mp4');
-
-    // const videoStream = fs.createReadStream(filePath);
-    // videoStream.pipe(res);
+    res.writeHead(200, headers);
+    fs.createReadStream(audioFilePath).pipe(res);
   });
 }
 
