@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { tokenKey } = require('../../config/index.js')
-const passUrls = ['/login', '/register', '/aaa']
+const passUrls = ['/login', '/register', '/aaa', '/music']
 
 // 定义中间件函数
 const authMiddleware = (req, res, next) => {

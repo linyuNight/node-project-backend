@@ -1,4 +1,4 @@
-// var express = require('express');
+var express = require('express');
 const fs = require('fs');
 var app = require('express')();
 const cors = require('cors');
@@ -67,7 +67,7 @@ loginAndRegist(app, db)
 // 聊天接口
 ioChat(isPro, http, app, db)
 
-// app.use(express.static('public'));
+app.use(express.static('uploads'));
 
 // 网络测试接口
 app.get('/aaa', (req, res) => {

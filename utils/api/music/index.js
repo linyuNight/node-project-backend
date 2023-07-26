@@ -40,10 +40,10 @@ const music = (isPro, app) => {
 
   // 播放音乐
   app.get('/music', (req, res) => {
-    console.log('测试参数', req.decoded)
-    if(req.query.userid !== req.decoded.user.userid) {
-      return res.send('token校验失败')
-    }
+    // console.log('测试参数', req.decoded)
+    // if(req.query.userid !== req.decoded.user.userid) {
+    //   return res.send('token校验失败')
+    // }
 
     const filename = req.query.filename
     // 获取要下载的文件路径
