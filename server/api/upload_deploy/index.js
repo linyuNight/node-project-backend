@@ -176,9 +176,6 @@ const uploadDeploy = (isPro, app) => {
       // console.log('测试zzzzisPro2', isPro)
 
       if(isPro) {
-        console.log('zzzz')
-        // const command = 'sudo systemctl restart nginx';
-
         const scriptPath = path.join(__dirname, './restart_nginx.sh');
         exec(`sh ${scriptPath}`, (error, stdout, stderr) => {
           if (error) {
