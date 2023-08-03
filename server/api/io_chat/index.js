@@ -199,7 +199,7 @@ const ioChat = (isPro, http, app, db) => {
         groupname: req.body.groupname
       });
 
-      // console.log('测试群信息', existingGroup)
+      console.log('测试群信息existingGroup', existingGroup)
       if (existingGroup) {
         res.send(existingGroup)
       } else {
